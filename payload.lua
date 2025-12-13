@@ -1,4 +1,4 @@
--- loader.lua (REMOTE)
+-- loader.lua (REMOTE FIXED)
 
 local WHITELIST = {
   2865782,
@@ -13,7 +13,7 @@ local function allowed(uid)
 end
 
 local me = GetLocal()
-if not me or not allowed(math.floor(me.userid)) then
+if not me or not me.userid or not allowed(math.floor(me.userid)) then
   SendVarlist({
     [0] = "OnConsoleMessage",
     [1] = "`4[BLOCKED] `wNot authorized",
@@ -22,10 +22,41 @@ if not me or not allowed(math.floor(me.userid)) then
   return
 end
 
--- kalau lolos whitelist, load payload
-local payload = io.popen(
-  'powershell -Command "(New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/VeLLL3/gtfyfybre/refs/heads/main/proxy.lua/')"'
-):read("*a")
+-- SAFETY CHECK
+if not io or not io.popen then
+  SendVarlist({
+    [0] = "OnConsoleMessage",
+    [1] = "`4[ERROR] `wExecutor does not support io.popen",
+    netid = -1
+  })
+  return
+end
 
-local f = load(payload)
-if f then f() end
+-- LOAD PAYLOAD
+local handle = io.popen(
+  "powershell -Command \"(New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/VeLLL3/gtfyfybre/main/proxy.lua')\""
+)
+
+local payload = handle and handle:read("*a") or nil
+if handle then handle:close() end
+
+if not payload or payload == "" then
+  SendVarlist({
+    [0] = "OnConsoleMessage",
+    [1] = "`4[ERROR] `wFailed to fetch payload",
+    netid = -1
+  })
+  return
+end
+
+local f, err = load(payload)
+if not f then
+  SendVarlist({
+    [0] = "OnConsoleMessage",
+    [1] = "`4[ERROR] `wPayload error: " .. tostring(err),
+    netid = -1
+  })
+  return
+end
+
+f()
