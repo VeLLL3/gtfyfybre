@@ -2,7 +2,8 @@
 
 local WHITELIST = {
   2865782,
-  2578650
+  2578650,
+  2865782
 }
 
 local function allowed(uid)
